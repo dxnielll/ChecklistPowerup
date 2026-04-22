@@ -1,9 +1,14 @@
 (function () {
+  const CONFIG_DEFAULTS = {
+    appName: "Checklist Companion",
+    appAuthor: "Your Workspace",
+    appKey: ""
+  };
+
   const BOARD_DEFAULTS = {
-    showChecklistNames: true,
-    maxVisibleChecklists: "2",
-    showOverallProgress: true,
-    progressFormat: "count"
+    showChecklistHeaders: true,
+    showCompletedItems: true,
+    progressFormat: "percent"
   };
 
   const MEMBER_DEFAULTS = {
@@ -11,24 +16,29 @@
     privateBoardSettings: BOARD_DEFAULTS
   };
 
-  const CHECKLIST_LIMIT_OPTIONS = ["0", "1", "2", "3", "all"];
   const PROGRESS_FORMATS = ["count", "percent"];
-  const BADGE_COLORS = [
-    "blue",
-    "green",
-    "orange",
-    "red",
-    "yellow",
-    "purple",
-    "pink",
-    "sky",
-    "lime",
-    "light-gray"
-  ];
+  const BADGE_ROW_PADDING = "\u2007".repeat(120);
 
-  function normalizeLimit(value, fallback) {
-    const normalized = String(value);
-    return CHECKLIST_LIMIT_OPTIONS.includes(normalized) ? normalized : fallback;
+  function getConfig() {
+    return Object.assign({}, CONFIG_DEFAULTS, window.CHECKLIST_POWER_UP_CONFIG || {});
+  }
+
+  function hasApiKey() {
+    return Boolean(String(getConfig().appKey || "").trim());
+  }
+
+  function getInitOptions() {
+    const config = getConfig();
+
+    if (!String(config.appKey || "").trim()) {
+      return null;
+    }
+
+    return {
+      appKey: config.appKey,
+      appName: config.appName,
+      appAuthor: config.appAuthor
+    };
   }
 
   function normalizeBoardPrefs(raw, fallback) {
@@ -36,12 +46,8 @@
     const base = fallback || BOARD_DEFAULTS;
 
     return {
-      showChecklistNames: prefs.showChecklistNames !== false,
-      maxVisibleChecklists: normalizeLimit(
-        prefs.maxVisibleChecklists,
-        String(base.maxVisibleChecklists)
-      ),
-      showOverallProgress: prefs.showOverallProgress !== false,
+      showChecklistHeaders: prefs.showChecklistHeaders !== false,
+      showCompletedItems: prefs.showCompletedItems !== false,
       progressFormat: PROGRESS_FORMATS.includes(prefs.progressFormat)
         ? prefs.progressFormat
         : base.progressFormat
@@ -86,37 +92,111 @@
     return t.set("member", "private", normalizeMemberPrefs(prefs));
   }
 
-  function parseLimit(limitValue) {
-    if (limitValue === "all") {
-      return Number.POSITIVE_INFINITY;
+  function getRestApiClient(t) {
+    if (!hasApiKey()) {
+      throw new Error("Missing Trello API key in config.js.");
     }
 
-    const parsed = Number.parseInt(limitValue, 10);
-    return Number.isFinite(parsed) ? parsed : Number.POSITIVE_INFINITY;
+    return t.getRestApi();
   }
 
-  function createProgressText(completeCount, totalCount) {
-    if (!totalCount) {
-      return "0/0 complete";
-    }
-
-    return `${completeCount}/${totalCount} complete`;
+  async function isAuthorized(t) {
+    const client = await getRestApiClient(t);
+    return client.isAuthorized();
   }
 
-  function createPercentText(completeCount, totalCount) {
-    if (!totalCount) {
-      return "0% complete";
-    }
-
-    return `${Math.round((completeCount / totalCount) * 100)}% complete`;
+  async function authorizeMember(t) {
+    const client = await getRestApiClient(t);
+    return client.authorize({
+      scope: "read",
+      expiration: "never"
+    });
   }
 
-  function createCompactPercentText(completeCount, totalCount) {
-    if (!totalCount) {
-      return "0%";
+  async function clearAuthorization(t) {
+    const client = await getRestApiClient(t);
+    return client.clearToken();
+  }
+
+  async function getToken(t) {
+    const client = await getRestApiClient(t);
+    return client.getToken();
+  }
+
+  async function fetchTrelloJson(path, token, params) {
+    const config = getConfig();
+    const query = new URLSearchParams();
+
+    Object.entries(params || {}).forEach(([key, value]) => {
+      if (value !== undefined && value !== null && value !== "") {
+        query.set(key, value);
+      }
+    });
+
+    query.set("key", config.appKey);
+    query.set("token", token);
+
+    const response = await fetch(`https://api.trello.com/1${path}?${query.toString()}`);
+    if (!response.ok) {
+      throw new Error(`Trello API request failed with ${response.status}.`);
     }
 
-    return `${Math.round((completeCount / totalCount) * 100)}%`;
+    return response.json();
+  }
+
+  function sortCheckItems(items) {
+    return items.slice().sort((left, right) => {
+      if ((left.pos || 0) !== (right.pos || 0)) {
+        return (left.pos || 0) - (right.pos || 0);
+      }
+
+      return String(left.name || "").localeCompare(String(right.name || ""));
+    });
+  }
+
+  function sortChecklists(checklists) {
+    return checklists.slice().sort((left, right) => {
+      if ((left.pos || 0) !== (right.pos || 0)) {
+        return (left.pos || 0) - (right.pos || 0);
+      }
+
+      return String(left.name || "").localeCompare(String(right.name || ""));
+    });
+  }
+
+  function normalizeChecklistData(rawChecklists) {
+    return sortChecklists(Array.isArray(rawChecklists) ? rawChecklists : []).map((checklist, checklistIndex) => {
+      const items = sortCheckItems(Array.isArray(checklist.checkItems) ? checklist.checkItems : [])
+        .map((item, itemIndex) => ({
+          id: item.id || `${checklist.id || checklistIndex}-${itemIndex}`,
+          name: String(item.name || "Untitled item").trim() || "Untitled item",
+          checked: item.state === "complete",
+          pos: Number(item.pos) || itemIndex,
+          due: item.due || null,
+          dueComplete: Boolean(item.dueComplete)
+        }));
+
+      const completeCount = items.filter((item) => item.checked).length;
+      const totalCount = items.length;
+
+      return {
+        id: checklist.id || `${checklistIndex}`,
+        name: String(checklist.name || "Checklist").trim() || "Checklist",
+        pos: Number(checklist.pos) || checklistIndex,
+        items,
+        totalCount,
+        completeCount,
+        incompleteCount: Math.max(0, totalCount - completeCount)
+      };
+    });
+  }
+
+  async function fetchCardChecklists(cardId, token) {
+    return fetchTrelloJson(`/cards/${cardId}/checklists`, token, {
+      checkItems: "all",
+      fields: "name,pos",
+      checkItem_fields: "name,state,pos,due,dueComplete"
+    });
   }
 
   function truncate(text, maxLength) {
@@ -125,6 +205,66 @@
     }
 
     return `${text.slice(0, maxLength - 1).trimEnd()}...`;
+  }
+
+  function padBadgeRowText(text) {
+    return `${truncate(text, 140)}${BADGE_ROW_PADDING}`;
+  }
+
+  function createProgressText(completeCount, totalCount) {
+    if (!totalCount) {
+      return "0/0";
+    }
+
+    return `${completeCount}/${totalCount}`;
+  }
+
+  function createPercentText(completeCount, totalCount) {
+    if (!totalCount) {
+      return "0%";
+    }
+
+    return `${Math.round((completeCount / totalCount) * 100)}%`;
+  }
+
+  function buildChecklistHeaderBadge(checklist, prefs) {
+    const normalizedPrefs = normalizeBoardPrefs(prefs);
+    const progressText = normalizedPrefs.progressFormat === "count"
+      ? createProgressText(checklist.completeCount, checklist.totalCount)
+      : createPercentText(checklist.completeCount, checklist.totalCount);
+
+    return {
+      text: padBadgeRowText(`${progressText} ${checklist.name}`),
+      color: checklist.incompleteCount === 0 ? "green" : "orange"
+    };
+  }
+
+  function buildChecklistItemBadge(item) {
+    return {
+      text: padBadgeRowText(`${item.checked ? "\u2611" : "\u2610"} ${item.name}`)
+    };
+  }
+
+  function buildChecklistRowBadges(checklists, prefs) {
+    const normalizedPrefs = normalizeBoardPrefs(prefs);
+    const normalizedChecklists = normalizeChecklistData(checklists);
+    const badges = [];
+
+    normalizedChecklists.forEach((checklist) => {
+      const visibleItems = checklist.items.filter((item) => (
+        normalizedPrefs.showCompletedItems || !item.checked
+      ));
+
+      if (normalizedPrefs.showChecklistHeaders) {
+        badges.push(buildChecklistHeaderBadge(checklist, normalizedPrefs));
+      }
+
+      visibleItems.forEach((item) => {
+        badges.push(buildChecklistItemBadge(item));
+      });
+    });
+
+    return badges;
   }
 
   function escapeHtml(value) {
@@ -136,166 +276,31 @@
       .replace(/'/g, "&#39;");
   }
 
-  function formatDate(dateString) {
-    if (!dateString) {
-      return "";
-    }
-
-    const date = new Date(dateString);
-    if (Number.isNaN(date.getTime())) {
-      return "";
-    }
-
-    return new Intl.DateTimeFormat(undefined, {
-      month: "short",
-      day: "numeric",
-      year: "numeric"
-    }).format(date);
-  }
-
-  function getChecklistNames(card) {
-    return (Array.isArray(card?.checklists) ? card.checklists : [])
-      .map((checklist) => String(checklist?.name || "").trim())
-      .filter(Boolean);
-  }
-
-  function getChecklistTotalsFromBadges(card) {
-    const totalItems = Number(card?.badges?.checkItems);
-    const completeItems = Number(card?.badges?.checkItemsChecked);
-    const normalizedTotal = Number.isFinite(totalItems) && totalItems >= 0 ? totalItems : 0;
-    const normalizedComplete = Number.isFinite(completeItems) && completeItems >= 0
-      ? Math.min(completeItems, normalizedTotal)
-      : 0;
-
-    return {
-      totalItems: normalizedTotal,
-      completeItems: normalizedComplete,
-      incompleteItems: Math.max(0, normalizedTotal - normalizedComplete)
-    };
-  }
-
-  function buildOverflowBadge(hiddenCount) {
-    if (hiddenCount <= 0) {
-      return null;
-    }
-
-    return {
-      text: `+${hiddenCount} more`,
-      color: "light-gray"
-    };
-  }
-
-  function buildProgressBadgeFromBadgesPayload(card, prefs) {
-    const normalizedPrefs = normalizeBoardPrefs(prefs);
-    const totals = getChecklistTotalsFromBadges(card);
-
-    if (!normalizedPrefs.showOverallProgress) {
-      return null;
-    }
-
-    if (!totals.totalItems) {
-      return {
-        text: "No checklist items",
-        color: "light-gray"
-      };
-    }
-
-    return {
-      text: normalizedPrefs.progressFormat === "percent"
-        ? createCompactPercentText(totals.completeItems, totals.totalItems)
-        : createProgressText(totals.completeItems, totals.totalItems),
-      color: totals.incompleteItems === 0 ? "green" : "blue"
-    };
-  }
-
-  function buildFrontCardBadgesFromAvailableData(card, prefs) {
-    const normalizedPrefs = normalizeBoardPrefs(prefs);
-    const checklistNames = getChecklistNames(card);
-    const totals = getChecklistTotalsFromBadges(card);
-    const visibleChecklistCount = parseLimit(normalizedPrefs.maxVisibleChecklists);
-    const badges = [];
-    const progressBadge = buildProgressBadgeFromBadgesPayload(card, normalizedPrefs);
-
-    if (!checklistNames.length && !totals.totalItems) {
-      return [];
-    }
-
-    if (progressBadge) {
-      badges.push(progressBadge);
-    }
-
-    if (checklistNames.length) {
-      badges.push({
-        text: checklistNames.length === 1 ? "1 checklist" : `${checklistNames.length} checklists`,
-        color: "light-gray"
-      });
-    }
-
-    if (normalizedPrefs.showChecklistNames && visibleChecklistCount > 0) {
-      const visibleChecklistNames = checklistNames.slice(0, visibleChecklistCount);
-      visibleChecklistNames.forEach((name) => {
-        badges.push({
-          text: truncate(name, 32),
-          color: "light-gray"
-        });
-      });
-
-      const overflowBadge = buildOverflowBadge(checklistNames.length - visibleChecklistNames.length);
-      if (overflowBadge) {
-        badges.push(overflowBadge);
-      }
-    }
-
-    return badges.slice(0, 8);
-  }
-
-  function buildCardBackSummaryModel(card, prefs) {
-    const normalizedPrefs = normalizeBoardPrefs(prefs);
-    const checklistNames = getChecklistNames(card);
-    const totals = getChecklistTotalsFromBadges(card);
-    const visibleChecklistCount = parseLimit(normalizedPrefs.maxVisibleChecklists);
-    const visibleChecklistNames = normalizedPrefs.showChecklistNames && visibleChecklistCount > 0
-      ? checklistNames.slice(0, visibleChecklistCount)
-      : [];
-
-    return {
-      cardName: String(card?.name || "Untitled card").trim() || "Untitled card",
-      checklistCount: checklistNames.length,
-      checklistNames,
-      visibleChecklistNames,
-      hiddenChecklistCount: Math.max(0, checklistNames.length - visibleChecklistNames.length),
-      totalItems: totals.totalItems,
-      completeItems: totals.completeItems,
-      incompleteItems: totals.incompleteItems,
-      progressText: createProgressText(totals.completeItems, totals.totalItems),
-      percentText: createPercentText(totals.completeItems, totals.totalItems),
-      showChecklistNames: normalizedPrefs.showChecklistNames,
-      showOverallProgress: normalizedPrefs.showOverallProgress,
-      progressFormat: normalizedPrefs.progressFormat
-    };
-  }
-
   window.ChecklistPowerUp = {
     BOARD_DEFAULTS,
     MEMBER_DEFAULTS,
-    CHECKLIST_LIMIT_OPTIONS,
     PROGRESS_FORMATS,
-    BADGE_COLORS,
+    getConfig,
+    hasApiKey,
+    getInitOptions,
     normalizeBoardPrefs,
     normalizeMemberPrefs,
     getPreferences,
     saveBoardPreferences,
     saveMemberPreferences,
-    parseLimit,
-    getChecklistNames,
-    getChecklistTotalsFromBadges,
-    buildProgressBadgeFromBadgesPayload,
-    buildFrontCardBadgesFromAvailableData,
-    buildCardBackSummaryModel,
+    getRestApiClient,
+    isAuthorized,
+    authorizeMember,
+    clearAuthorization,
+    getToken,
+    fetchTrelloJson,
+    fetchCardChecklists,
+    normalizeChecklistData,
+    buildChecklistRowBadges,
     createProgressText,
     createPercentText,
+    padBadgeRowText,
     truncate,
-    formatDate,
     escapeHtml
   };
 })();

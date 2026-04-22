@@ -12,46 +12,53 @@
     <section class="surface stack-lg">
       <header class="stack-sm">
         <p class="eyebrow">Checklist settings</p>
-        <h1>Display preferences</h1>
-        <p class="quiet">Board defaults affect everyone on the board. Private board settings let you use your own summary view on this board.</p>
+        <h1>Front-card checklist rows</h1>
+        <p class="quiet">This Power-Up renders checklist headers and checklist items directly on the front of cards using Trello badge rows.</p>
       </header>
 
       <section class="stack-md">
         <div class="section-heading">
           <div>
+            <h2>Trello access</h2>
+            <p class="quiet">Authorize read access once so the Power-Up can load full checklist items for each card.</p>
+          </div>
+          <span id="auth-status-pill" class="pill">Checking access...</span>
+        </div>
+
+        <div class="callout stack-sm">
+          <p class="quiet">Make sure your Power-Up API key is configured in <code>config.js</code> and your GitHub Pages origin is allowed in the Power-Up admin API key settings.</p>
+          <div class="button-row">
+            <button id="connect-btn" class="mod-primary" type="button">Connect Trello access</button>
+            <button id="disconnect-btn" type="button">Disconnect</button>
+          </div>
+        </div>
+      </section>
+
+      <section class="stack-md">
+        <div class="section-heading">
+          <div>
             <h2>Board defaults</h2>
-            <p class="quiet">Choose how checklist progress and checklist names appear on the card front and card back.</p>
+            <p class="quiet">These settings control the checklist rows shown on the front of cards for everyone on the board.</p>
           </div>
           <span id="board-permission-pill" class="pill">Checking permissions...</span>
         </div>
 
         <div class="settings-grid">
-          <label class="checkbox-row" for="board-show-overall-progress">
-            <input id="board-show-overall-progress" type="checkbox">
-            <span>Show overall progress</span>
+          <label class="checkbox-row" for="board-show-checklist-headers">
+            <input id="board-show-checklist-headers" type="checkbox">
+            <span>Show checklist headers</span>
+          </label>
+
+          <label class="checkbox-row" for="board-show-completed-items">
+            <input id="board-show-completed-items" type="checkbox">
+            <span>Show completed items</span>
           </label>
 
           <label class="stack-xs" for="board-progress-format">
-            <span>Progress format</span>
+            <span>Header progress format</span>
             <select id="board-progress-format">
-              <option value="count">completed / total</option>
               <option value="percent">percentage complete</option>
-            </select>
-          </label>
-
-          <label class="checkbox-row" for="board-show-checklist-names">
-            <input id="board-show-checklist-names" type="checkbox">
-            <span>Show checklist names</span>
-          </label>
-
-          <label class="stack-xs" for="board-max-visible-checklists">
-            <span>Visible checklist names</span>
-            <select id="board-max-visible-checklists">
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="all">all</option>
+              <option value="count">completed / total</option>
             </select>
           </label>
         </div>
@@ -65,7 +72,7 @@
         <div class="section-heading">
           <div>
             <h2>My preferences</h2>
-            <p class="quiet">Switch on private board settings if you want your own checklist summary view on this board.</p>
+            <p class="quiet">Enable private board settings if you want your own checklist-row display on this board.</p>
           </div>
         </div>
 
@@ -75,32 +82,21 @@
         </label>
 
         <div id="private-settings-panel" class="settings-grid">
-          <label class="checkbox-row" for="private-show-overall-progress">
-            <input id="private-show-overall-progress" type="checkbox">
-            <span>Show overall progress</span>
+          <label class="checkbox-row" for="private-show-checklist-headers">
+            <input id="private-show-checklist-headers" type="checkbox">
+            <span>Show checklist headers</span>
+          </label>
+
+          <label class="checkbox-row" for="private-show-completed-items">
+            <input id="private-show-completed-items" type="checkbox">
+            <span>Show completed items</span>
           </label>
 
           <label class="stack-xs" for="private-progress-format">
-            <span>Progress format</span>
+            <span>Header progress format</span>
             <select id="private-progress-format">
-              <option value="count">completed / total</option>
               <option value="percent">percentage complete</option>
-            </select>
-          </label>
-
-          <label class="checkbox-row" for="private-show-checklist-names">
-            <input id="private-show-checklist-names" type="checkbox">
-            <span>Show checklist names</span>
-          </label>
-
-          <label class="stack-xs" for="private-max-visible-checklists">
-            <span>Visible checklist names</span>
-            <select id="private-max-visible-checklists">
-              <option value="0">0</option>
-              <option value="1">1</option>
-              <option value="2">2</option>
-              <option value="3">3</option>
-              <option value="all">all</option>
+              <option value="count">completed / total</option>
             </select>
           </label>
         </div>
@@ -116,6 +112,7 @@
   </main>
 
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script src="config.js"></script>
   <script src="shared.js"></script>
   <script src="settings.js"></script>
 </body>

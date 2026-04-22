@@ -1,8 +1,12 @@
 (function () {
   const App = window.ChecklistPowerUp;
-  const t = window.TrelloPowerUp.iframe();
+  const initOptions = App.getInitOptions();
+  const t = initOptions ? window.TrelloPowerUp.iframe(initOptions) : window.TrelloPowerUp.iframe();
 
   const boardPermissionPill = document.getElementById("board-permission-pill");
+  const authStatusPill = document.getElementById("auth-status-pill");
+  const connectBtn = document.getElementById("connect-btn");
+  const disconnectBtn = document.getElementById("disconnect-btn");
   const saveBoardBtn = document.getElementById("save-board-btn");
   const saveMemberBtn = document.getElementById("save-member-btn");
   const closeBtn = document.getElementById("close-btn");
@@ -13,16 +17,14 @@
   let canWriteBoard = false;
 
   const boardInputs = {
-    showChecklistNames: document.getElementById("board-show-checklist-names"),
-    maxVisibleChecklists: document.getElementById("board-max-visible-checklists"),
-    showOverallProgress: document.getElementById("board-show-overall-progress"),
+    showChecklistHeaders: document.getElementById("board-show-checklist-headers"),
+    showCompletedItems: document.getElementById("board-show-completed-items"),
     progressFormat: document.getElementById("board-progress-format")
   };
 
   const privateInputs = {
-    showChecklistNames: document.getElementById("private-show-checklist-names"),
-    maxVisibleChecklists: document.getElementById("private-max-visible-checklists"),
-    showOverallProgress: document.getElementById("private-show-overall-progress"),
+    showChecklistHeaders: document.getElementById("private-show-checklist-headers"),
+    showCompletedItems: document.getElementById("private-show-completed-items"),
     progressFormat: document.getElementById("private-progress-format")
   };
 
@@ -34,23 +36,8 @@
     }
   }
 
-  function updateBoardPermissionState() {
-    const inputs = Object.values(boardInputs).concat(saveBoardBtn);
-
-    inputs.forEach((input) => {
-      input.disabled = !canWriteBoard;
-    });
-
-    boardPermissionPill.textContent = canWriteBoard ? "Can edit board defaults" : "Board defaults are read-only";
-    boardPermissionPill.className = canWriteBoard ? "pill pill-success" : "pill pill-warning";
-  }
-
   function setInputs(targets, values) {
     Object.entries(targets).forEach(([key, input]) => {
-      if (!input) {
-        return;
-      }
-
       if (input.type === "checkbox") {
         input.checked = Boolean(values[key]);
         return;
@@ -72,6 +59,17 @@
     );
   }
 
+  function updateBoardPermissionState() {
+    const inputs = Object.values(boardInputs).concat(saveBoardBtn);
+
+    inputs.forEach((input) => {
+      input.disabled = !canWriteBoard;
+    });
+
+    boardPermissionPill.textContent = canWriteBoard ? "Can edit board defaults" : "Board defaults are read-only";
+    boardPermissionPill.className = canWriteBoard ? "pill pill-success" : "pill pill-warning";
+  }
+
   function updatePrivatePanelState() {
     privateSettingsPanel.classList.toggle("is-disabled", !usePrivateBoardSettings.checked);
     Object.values(privateInputs).forEach((input) => {
@@ -79,11 +77,29 @@
     });
   }
 
-  function populateForms(preferences) {
-    setInputs(boardInputs, preferences.board);
-    usePrivateBoardSettings.checked = preferences.member.usePrivateBoardSettings;
-    setInputs(privateInputs, preferences.member.privateBoardSettings);
-    updatePrivatePanelState();
+  function setAuthPill(text, toneClass) {
+    authStatusPill.textContent = text;
+    authStatusPill.className = toneClass ? `pill ${toneClass}` : "pill";
+  }
+
+  async function refreshAuthorizationState() {
+    if (!App.hasApiKey()) {
+      setAuthPill("Missing API key", "pill-warning");
+      connectBtn.disabled = true;
+      disconnectBtn.disabled = true;
+      return;
+    }
+
+    try {
+      const authorized = await App.isAuthorized(t);
+      setAuthPill(authorized ? "Connected" : "Not connected", authorized ? "pill-success" : "pill-warning");
+      connectBtn.disabled = authorized;
+      disconnectBtn.disabled = !authorized;
+    } catch (error) {
+      setAuthPill("Auth check failed", "pill-warning");
+      connectBtn.disabled = false;
+      disconnectBtn.disabled = true;
+    }
   }
 
   async function syncHeight() {
@@ -98,7 +114,10 @@
 
   async function loadSettings() {
     const preferences = await App.getPreferences(t);
-    populateForms(preferences);
+    setInputs(boardInputs, preferences.board);
+    usePrivateBoardSettings.checked = preferences.member.usePrivateBoardSettings;
+    setInputs(privateInputs, preferences.member.privateBoardSettings);
+    updatePrivatePanelState();
 
     if (typeof t.memberCanWriteToModel === "function") {
       canWriteBoard = t.memberCanWriteToModel("board");
@@ -108,6 +127,7 @@
     }
 
     updateBoardPermissionState();
+    await refreshAuthorizationState();
     setStatus("Loaded current preferences.", "success");
     await syncHeight();
   }
@@ -122,6 +142,43 @@
       privateBoardSettings: readInputs(privateInputs)
     });
   }
+
+  connectBtn.addEventListener("click", async function () {
+    if (!App.hasApiKey()) {
+      setStatus("Add your Trello API key to config.js before connecting access.", "error");
+      return;
+    }
+
+    connectBtn.disabled = true;
+    setStatus("Opening Trello authorization...", "pending");
+
+    try {
+      await App.authorizeMember(t);
+      await refreshAuthorizationState();
+      setStatus("Connected Trello access.", "success");
+    } catch (error) {
+      setStatus(`Could not connect Trello access: ${error.message}`, "error");
+      await refreshAuthorizationState();
+    } finally {
+      await syncHeight();
+    }
+  });
+
+  disconnectBtn.addEventListener("click", async function () {
+    disconnectBtn.disabled = true;
+    setStatus("Disconnecting Trello access...", "pending");
+
+    try {
+      await App.clearAuthorization(t);
+      await refreshAuthorizationState();
+      setStatus("Disconnected Trello access.", "success");
+    } catch (error) {
+      setStatus(`Could not disconnect Trello access: ${error.message}`, "error");
+      await refreshAuthorizationState();
+    } finally {
+      await syncHeight();
+    }
+  });
 
   saveBoardBtn.addEventListener("click", async function () {
     if (!canWriteBoard) {
