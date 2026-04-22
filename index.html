@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checklist Companion Connector</title>
+  <link rel="stylesheet" href="https://p.trellocdn.com/power-up.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="connector-page">
+  <main id="content" class="standalone-shell">
+    <section class="surface standalone-panel">
+      <p class="eyebrow">Trello Power-Up</p>
+      <h1>Checklist Companion</h1>
+      <p>
+        Use this page as the iframe connector URL for a custom Trello Power-Up that shows checklist progress and checklist items directly on the front of Trello cards.
+      </p>
+      <ol class="setup-list">
+        <li>Create a custom Power-Up in <code>https://trello.com/apps/admin</code>.</li>
+        <li>Set this file's hosted URL as the <code>iframe Connector URL</code>.</li>
+        <li>Enable <code>card-badges</code> and <code>show-settings</code>.</li>
+        <li>Add the Power-Up to a board in the same Workspace and open Power-Up settings to configure the front-of-card display.</li>
+      </ol>
+      <p class="quiet">
+        If you are opening this page directly in a browser, it is working as expected. Trello will load it silently as the connector iframe.
+      </p>
+    </section>
+  </main>
+
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script src="shared.js"></script>
+  <script src="connector.js"></script>
+</body>
+</html>

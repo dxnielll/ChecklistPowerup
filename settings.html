@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checklist Companion Settings</title>
+  <link rel="stylesheet" href="https://p.trellocdn.com/power-up.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="content" class="powerup-shell">
+    <section class="surface stack-lg">
+      <header class="stack-sm">
+        <p class="eyebrow">Checklist settings</p>
+        <h1>Display preferences</h1>
+        <p class="quiet">Board defaults affect everyone on the board. Private board settings let you use your own front-of-card display on this board.</p>
+      </header>
+
+      <section class="stack-md">
+        <div class="section-heading">
+          <div>
+            <h2>Board defaults</h2>
+            <p class="quiet">Choose how checklist information appears on card fronts.</p>
+          </div>
+          <span id="board-permission-pill" class="pill">Checking permissions...</span>
+        </div>
+
+        <div class="settings-grid">
+          <label class="checkbox-row" for="board-show-complete-checklists">
+            <input id="board-show-complete-checklists" type="checkbox">
+            <span>Show all complete checklists</span>
+          </label>
+
+          <label class="stack-xs" for="board-incomplete-checklist-limit">
+            <span>Show incomplete checklist(s)</span>
+            <select id="board-incomplete-checklist-limit">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="all">all</option>
+            </select>
+          </label>
+
+          <label class="checkbox-row" for="board-show-checklist-title">
+            <input id="board-show-checklist-title" type="checkbox">
+            <span>Show checklist title</span>
+          </label>
+
+          <label class="stack-xs" for="board-complete-color">
+            <span>Complete color</span>
+            <select id="board-complete-color">
+              <option value="green">green</option>
+              <option value="blue">blue</option>
+              <option value="orange">orange</option>
+              <option value="red">red</option>
+              <option value="yellow">yellow</option>
+              <option value="purple">purple</option>
+              <option value="pink">pink</option>
+              <option value="sky">sky</option>
+              <option value="lime">lime</option>
+              <option value="light-gray">light-gray</option>
+            </select>
+          </label>
+
+          <label class="stack-xs" for="board-incomplete-color">
+            <span>Incomplete color</span>
+            <select id="board-incomplete-color">
+              <option value="orange">orange</option>
+              <option value="green">green</option>
+              <option value="blue">blue</option>
+              <option value="red">red</option>
+              <option value="yellow">yellow</option>
+              <option value="purple">purple</option>
+              <option value="pink">pink</option>
+              <option value="sky">sky</option>
+              <option value="lime">lime</option>
+              <option value="light-gray">light-gray</option>
+            </select>
+          </label>
+
+          <label class="checkbox-row" for="board-show-checklist-progress">
+            <input id="board-show-checklist-progress" type="checkbox">
+            <span>Show checklist progress</span>
+          </label>
+
+          <label class="stack-xs" for="board-progress-format">
+            <span>Progress format</span>
+            <select id="board-progress-format">
+              <option value="count">number of items</option>
+              <option value="percent">% complete</option>
+            </select>
+          </label>
+
+          <label class="checkbox-row" for="board-show-complete-items">
+            <input id="board-show-complete-items" type="checkbox">
+            <span>Show all complete items</span>
+          </label>
+
+          <label class="stack-xs" for="board-incomplete-item-limit">
+            <span>Show incomplete item(s)</span>
+            <select id="board-incomplete-item-limit">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="all">all</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button id="save-board-btn" class="mod-primary" type="button">Save board defaults</button>
+        </div>
+      </section>
+
+      <section class="stack-md">
+        <div class="section-heading">
+          <div>
+            <h2>My preferences</h2>
+            <p class="quiet">Switch on private board settings if you want your own front-of-card checklist display on this board.</p>
+          </div>
+        </div>
+
+        <label class="checkbox-row" for="use-private-board-settings">
+          <input id="use-private-board-settings" type="checkbox">
+          <span>Use private board settings</span>
+        </label>
+
+        <div id="private-settings-panel" class="settings-grid">
+          <label class="checkbox-row" for="private-show-complete-checklists">
+            <input id="private-show-complete-checklists" type="checkbox">
+            <span>Show all complete checklists</span>
+          </label>
+
+          <label class="stack-xs" for="private-incomplete-checklist-limit">
+            <span>Show incomplete checklist(s)</span>
+            <select id="private-incomplete-checklist-limit">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="all">all</option>
+            </select>
+          </label>
+
+          <label class="checkbox-row" for="private-show-checklist-title">
+            <input id="private-show-checklist-title" type="checkbox">
+            <span>Show checklist title</span>
+          </label>
+
+          <label class="stack-xs" for="private-complete-color">
+            <span>Complete color</span>
+            <select id="private-complete-color">
+              <option value="green">green</option>
+              <option value="blue">blue</option>
+              <option value="orange">orange</option>
+              <option value="red">red</option>
+              <option value="yellow">yellow</option>
+              <option value="purple">purple</option>
+              <option value="pink">pink</option>
+              <option value="sky">sky</option>
+              <option value="lime">lime</option>
+              <option value="light-gray">light-gray</option>
+            </select>
+          </label>
+
+          <label class="stack-xs" for="private-incomplete-color">
+            <span>Incomplete color</span>
+            <select id="private-incomplete-color">
+              <option value="orange">orange</option>
+              <option value="green">green</option>
+              <option value="blue">blue</option>
+              <option value="red">red</option>
+              <option value="yellow">yellow</option>
+              <option value="purple">purple</option>
+              <option value="pink">pink</option>
+              <option value="sky">sky</option>
+              <option value="lime">lime</option>
+              <option value="light-gray">light-gray</option>
+            </select>
+          </label>
+
+          <label class="checkbox-row" for="private-show-checklist-progress">
+            <input id="private-show-checklist-progress" type="checkbox">
+            <span>Show checklist progress</span>
+          </label>
+
+          <label class="stack-xs" for="private-progress-format">
+            <span>Progress format</span>
+            <select id="private-progress-format">
+              <option value="count">number of items</option>
+              <option value="percent">% complete</option>
+            </select>
+          </label>
+
+          <label class="checkbox-row" for="private-show-complete-items">
+            <input id="private-show-complete-items" type="checkbox">
+            <span>Show all complete items</span>
+          </label>
+
+          <label class="stack-xs" for="private-incomplete-item-limit">
+            <span>Show incomplete item(s)</span>
+            <select id="private-incomplete-item-limit">
+              <option value="0">0</option>
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="all">all</option>
+            </select>
+          </label>
+        </div>
+
+        <div class="button-row">
+          <button id="save-member-btn" class="mod-primary" type="button">Save my preferences</button>
+          <button id="close-btn" type="button">Done</button>
+        </div>
+      </section>
+
+      <p id="settings-status" class="status-text" aria-live="polite">Loading current preferences...</p>
+    </section>
+  </main>
+
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script src="shared.js"></script>
+  <script src="settings.js"></script>
+</body>
+</html>
