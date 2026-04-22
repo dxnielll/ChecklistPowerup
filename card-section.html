@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Checklist Diagnostics</title>
+  <title>Checklist Summary</title>
   <link rel="stylesheet" href="https://p.trellocdn.com/power-up.css">
   <link rel="stylesheet" href="styles.css">
 </head>
@@ -11,38 +11,50 @@
   <main id="content" class="powerup-shell">
     <section class="surface stack-lg">
       <header class="stack-sm">
-        <p class="eyebrow">Checklist diagnostics</p>
-        <h1>Card payload inspection</h1>
-        <p class="quiet">This section shows exactly what the Trello client library exposes in a card iframe context.</p>
+        <p class="eyebrow">Checklist summary</p>
+        <h1 id="card-section-card-name">Loading...</h1>
+        <p class="quiet">This summary uses the checklist counts and checklist names Trello exposes in public card contexts.</p>
       </header>
 
-      <p id="card-section-status" class="status-text" aria-live="polite">Loading card diagnostics...</p>
+      <p id="card-section-status" class="status-text" aria-live="polite">Loading checklist summary...</p>
 
-      <section class="callout stack-sm">
-        <h2>What to compare</h2>
-        <p class="quiet">If <code>checkItems</code> becomes a real array here, we can keep detailed checklist items in the card back even if front badges only support summary data.</p>
+      <section class="summary-card stack-sm">
+        <div class="section-heading wrap-heading">
+          <div>
+            <h2>Progress</h2>
+            <p id="card-section-progress" class="quiet">Loading...</p>
+          </div>
+        </div>
+        <div class="progress-track">
+          <span id="card-section-progress-bar" class="progress-fill"></span>
+        </div>
       </section>
 
-      <section class="diagnostic-grid">
-        <article class="nested-surface stack-sm">
-          <h2>Summary</h2>
-          <div id="card-section-summary" class="debug-block"></div>
+      <section class="stat-grid">
+        <article class="stat-card stat-blue">
+          <span class="stat-label">Checklists</span>
+          <strong id="card-section-checklist-count" class="stat-value">0</strong>
         </article>
+        <article class="stat-card stat-blue">
+          <span class="stat-label">Total items</span>
+          <strong id="card-section-total-items" class="stat-value">0</strong>
+        </article>
+        <article class="stat-card stat-green">
+          <span class="stat-label">Completed items</span>
+          <strong id="card-section-complete-items" class="stat-value">0</strong>
+        </article>
+      </section>
 
-        <article class="nested-surface stack-sm">
-          <h2>Badges</h2>
-          <pre id="card-section-badges" class="debug-block">Waiting for data...</pre>
-        </article>
+      <section class="stack-sm">
+        <div class="section-heading wrap-heading">
+          <div>
+            <h2>Checklist names</h2>
+            <p class="quiet">Shown according to your current Power-Up settings.</p>
+          </div>
+        </div>
 
-        <article class="nested-surface stack-sm">
-          <h2>First checklist</h2>
-          <pre id="card-section-first-checklist" class="debug-block">Waiting for data...</pre>
-        </article>
-
-        <article class="nested-surface stack-sm">
-          <h2>First checklist checkItems</h2>
-          <pre id="card-section-check-items" class="debug-block">Waiting for data...</pre>
-        </article>
+        <p id="card-section-empty" class="empty-state compact-empty" hidden></p>
+        <ul id="card-section-checklist-list" class="check-item-list dense-list"></ul>
       </section>
     </section>
   </main>

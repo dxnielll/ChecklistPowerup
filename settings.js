@@ -13,27 +13,17 @@
   let canWriteBoard = false;
 
   const boardInputs = {
-    showCompleteChecklists: document.getElementById("board-show-complete-checklists"),
-    incompleteChecklistLimit: document.getElementById("board-incomplete-checklist-limit"),
-    showChecklistTitle: document.getElementById("board-show-checklist-title"),
-    completeColor: document.getElementById("board-complete-color"),
-    incompleteColor: document.getElementById("board-incomplete-color"),
-    showChecklistProgress: document.getElementById("board-show-checklist-progress"),
-    progressFormat: document.getElementById("board-progress-format"),
-    showCompleteItems: document.getElementById("board-show-complete-items"),
-    incompleteItemLimit: document.getElementById("board-incomplete-item-limit")
+    showChecklistNames: document.getElementById("board-show-checklist-names"),
+    maxVisibleChecklists: document.getElementById("board-max-visible-checklists"),
+    showOverallProgress: document.getElementById("board-show-overall-progress"),
+    progressFormat: document.getElementById("board-progress-format")
   };
 
   const privateInputs = {
-    showCompleteChecklists: document.getElementById("private-show-complete-checklists"),
-    incompleteChecklistLimit: document.getElementById("private-incomplete-checklist-limit"),
-    showChecklistTitle: document.getElementById("private-show-checklist-title"),
-    completeColor: document.getElementById("private-complete-color"),
-    incompleteColor: document.getElementById("private-incomplete-color"),
-    showChecklistProgress: document.getElementById("private-show-checklist-progress"),
-    progressFormat: document.getElementById("private-progress-format"),
-    showCompleteItems: document.getElementById("private-show-complete-items"),
-    incompleteItemLimit: document.getElementById("private-incomplete-item-limit")
+    showChecklistNames: document.getElementById("private-show-checklist-names"),
+    maxVisibleChecklists: document.getElementById("private-max-visible-checklists"),
+    showOverallProgress: document.getElementById("private-show-overall-progress"),
+    progressFormat: document.getElementById("private-progress-format")
   };
 
   function setStatus(message, tone) {
@@ -102,6 +92,7 @@
     } catch (error) {
       return null;
     }
+
     return null;
   }
 
@@ -132,7 +123,7 @@
     });
   }
 
-  saveBoardBtn.addEventListener("click", async () => {
+  saveBoardBtn.addEventListener("click", async function () {
     if (!canWriteBoard) {
       setStatus("You need board edit access to save board defaults.", "error");
       return;
@@ -152,7 +143,7 @@
     }
   });
 
-  saveMemberBtn.addEventListener("click", async () => {
+  saveMemberBtn.addEventListener("click", async function () {
     saveMemberBtn.disabled = true;
     setStatus("Saving your preferences...", "pending");
 
@@ -167,16 +158,16 @@
     }
   });
 
-  closeBtn.addEventListener("click", () => {
+  closeBtn.addEventListener("click", function () {
     t.closePopup();
   });
 
-  usePrivateBoardSettings.addEventListener("change", async () => {
+  usePrivateBoardSettings.addEventListener("change", async function () {
     updatePrivatePanelState();
     await syncHeight();
   });
 
-  t.render(async () => {
+  t.render(async function () {
     try {
       await loadSettings();
     } catch (error) {

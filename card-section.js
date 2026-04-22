@@ -3,10 +3,14 @@
   const t = window.TrelloPowerUp.iframe();
 
   const statusEl = document.getElementById("card-section-status");
-  const summaryEl = document.getElementById("card-section-summary");
-  const badgesEl = document.getElementById("card-section-badges");
-  const firstChecklistEl = document.getElementById("card-section-first-checklist");
-  const checkItemsEl = document.getElementById("card-section-check-items");
+  const cardNameEl = document.getElementById("card-section-card-name");
+  const progressEl = document.getElementById("card-section-progress");
+  const checklistCountEl = document.getElementById("card-section-checklist-count");
+  const totalItemsEl = document.getElementById("card-section-total-items");
+  const completeItemsEl = document.getElementById("card-section-complete-items");
+  const progressBarEl = document.getElementById("card-section-progress-bar");
+  const checklistListEl = document.getElementById("card-section-checklist-list");
+  const checklistEmptyEl = document.getElementById("card-section-empty");
 
   function setStatus(message, tone) {
     statusEl.textContent = message;
@@ -16,50 +20,35 @@
     }
   }
 
-  function formatJson(value) {
-    if (value === undefined) {
-      return "undefined";
+  function renderChecklistNames(model) {
+    if (!model.showChecklistNames || !model.visibleChecklistNames.length) {
+      checklistListEl.innerHTML = "";
+      checklistEmptyEl.hidden = false;
+      checklistEmptyEl.textContent = model.checklistCount
+        ? "Checklist names are hidden by the current settings."
+        : "This card does not have any checklists yet.";
+      return;
     }
 
-    if (typeof value === "string") {
-      return value;
+    checklistEmptyEl.hidden = true;
+    const items = model.visibleChecklistNames.map((name) => (
+      `<li class="check-item"><span class="check-name">${App.escapeHtml(name)}</span></li>`
+    ));
+
+    if (model.hiddenChecklistCount > 0) {
+      items.push(
+        `<li class="check-item"><span class="check-name">+${App.escapeHtml(String(model.hiddenChecklistCount))} more checklist${model.hiddenChecklistCount === 1 ? "" : "s"}</span></li>`
+      );
     }
 
-    try {
-      return JSON.stringify(value, null, 2);
-    } catch (error) {
-      return `Could not serialize value: ${error.message}`;
-    }
+    checklistListEl.innerHTML = items.join("");
   }
 
-  function summarizeCardSectionPayload(card) {
-    const checklists = Array.isArray(card?.checklists) ? card.checklists : [];
-    const firstChecklist = checklists[0] || null;
-    const firstChecklistItems = firstChecklist?.checkItems;
-
-    return {
-      cardName: card?.name || "Untitled card",
-      topLevelKeys: card && typeof card === "object" ? Object.keys(card).sort() : [],
-      checklistCount: checklists.length,
-      firstChecklistKeys: firstChecklist && typeof firstChecklist === "object"
-        ? Object.keys(firstChecklist).sort()
-        : [],
-      checkItemsType: typeof firstChecklistItems,
-      checkItemsIsArray: Array.isArray(firstChecklistItems),
-      checkItemsLength: Array.isArray(firstChecklistItems) ? firstChecklistItems.length : null
-    };
-  }
-
-  function renderSummary(summary) {
-    summaryEl.innerHTML = [
-      `<p><strong>Card:</strong> ${App.escapeHtml(summary.cardName)}</p>`,
-      `<p><strong>Checklist count:</strong> ${App.escapeHtml(String(summary.checklistCount))}</p>`,
-      `<p><strong>checkItems typeof:</strong> ${App.escapeHtml(summary.checkItemsType)}</p>`,
-      `<p><strong>checkItems isArray:</strong> ${App.escapeHtml(String(summary.checkItemsIsArray))}</p>`,
-      `<p><strong>checkItems length:</strong> ${App.escapeHtml(String(summary.checkItemsLength))}</p>`,
-      `<p><strong>Top-level keys:</strong> ${App.escapeHtml(summary.topLevelKeys.join(", "))}</p>`,
-      `<p><strong>First checklist keys:</strong> ${App.escapeHtml(summary.firstChecklistKeys.join(", "))}</p>`
-    ].join("");
+  function syncProgressBar(model) {
+    const percent = model.totalItems
+      ? Math.round((model.completeItems / model.totalItems) * 100)
+      : 0;
+    progressBarEl.style.width = `${percent}%`;
   }
 
   async function syncHeight() {
@@ -74,32 +63,33 @@
 
   t.render(async function () {
     try {
-      const card = await t.card("all");
-      const firstChecklist = Array.isArray(card?.checklists) ? card.checklists[0] : null;
-      const firstChecklistItems = firstChecklist?.checkItems;
-      const summary = summarizeCardSectionPayload(card);
+      const [preferences, card] = await Promise.all([
+        App.getPreferences(t),
+        t.card("all")
+      ]);
+      const model = App.buildCardBackSummaryModel(card, preferences.effective);
 
-      console.log("[ChecklistPowerUp][card-back-section] t.card('all') summary", summary);
-      console.log("[ChecklistPowerUp][card-back-section] raw badges", card?.badges);
-      console.log("[ChecklistPowerUp][card-back-section] raw first checklist", firstChecklist);
-      console.log("[ChecklistPowerUp][card-back-section] raw first checklist checkItems", firstChecklistItems);
-      console.log("[ChecklistPowerUp][card-back-section] first checklist checkItems typeof", typeof firstChecklistItems);
-      console.log(
-        "[ChecklistPowerUp][card-back-section] first checklist checkItems isArray",
-        Array.isArray(firstChecklistItems)
-      );
-
-      renderSummary(summary);
-      badgesEl.textContent = formatJson(card?.badges);
-      firstChecklistEl.textContent = formatJson(firstChecklist);
-      checkItemsEl.textContent = formatJson(firstChecklistItems);
-      setStatus("Loaded card diagnostics.", "success");
+      cardNameEl.textContent = model.cardName;
+      progressEl.textContent = model.progressFormat === "percent"
+        ? model.percentText
+        : model.progressText;
+      checklistCountEl.textContent = String(model.checklistCount);
+      totalItemsEl.textContent = String(model.totalItems);
+      completeItemsEl.textContent = String(model.completeItems);
+      syncProgressBar(model);
+      renderChecklistNames(model);
+      setStatus("Loaded checklist summary.", "success");
     } catch (error) {
-      summaryEl.innerHTML = "";
-      badgesEl.textContent = "Could not load badges.";
-      firstChecklistEl.textContent = "Could not load first checklist.";
-      checkItemsEl.textContent = "Could not load checkItems.";
-      setStatus(`Could not load card diagnostics: ${error.message}`, "error");
+      cardNameEl.textContent = "Checklist summary unavailable";
+      progressEl.textContent = "Could not load";
+      checklistCountEl.textContent = "0";
+      totalItemsEl.textContent = "0";
+      completeItemsEl.textContent = "0";
+      progressBarEl.style.width = "0%";
+      checklistListEl.innerHTML = "";
+      checklistEmptyEl.hidden = false;
+      checklistEmptyEl.textContent = "Could not load the checklist summary for this card.";
+      setStatus(`Could not load checklist summary: ${error.message}`, "error");
     }
 
     await syncHeight();
