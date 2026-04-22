@@ -373,6 +373,24 @@ h3 {
   margin-top: 10px;
 }
 
+.diagnostic-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.debug-block {
+  margin: 0;
+  padding: 12px;
+  border-radius: 12px;
+  background: var(--page-neutral-soft);
+  border: 1px solid var(--page-border);
+  font-family: ui-monospace, SFMono-Regular, SFMono-Regular, Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.82rem;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
 @media (max-width: 720px) {
 .summary-toolbar {
     grid-template-columns: 1fr;

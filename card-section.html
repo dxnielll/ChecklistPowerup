@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checklist Diagnostics</title>
+  <link rel="stylesheet" href="https://p.trellocdn.com/power-up.css">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main id="content" class="powerup-shell">
+    <section class="surface stack-lg">
+      <header class="stack-sm">
+        <p class="eyebrow">Checklist diagnostics</p>
+        <h1>Card payload inspection</h1>
+        <p class="quiet">This section shows exactly what the Trello client library exposes in a card iframe context.</p>
+      </header>
+
+      <p id="card-section-status" class="status-text" aria-live="polite">Loading card diagnostics...</p>
+
+      <section class="callout stack-sm">
+        <h2>What to compare</h2>
+        <p class="quiet">If <code>checkItems</code> becomes a real array here, we can keep detailed checklist items in the card back even if front badges only support summary data.</p>
+      </section>
+
+      <section class="diagnostic-grid">
+        <article class="nested-surface stack-sm">
+          <h2>Summary</h2>
+          <div id="card-section-summary" class="debug-block"></div>
+        </article>
+
+        <article class="nested-surface stack-sm">
+          <h2>Badges</h2>
+          <pre id="card-section-badges" class="debug-block">Waiting for data...</pre>
+        </article>
+
+        <article class="nested-surface stack-sm">
+          <h2>First checklist</h2>
+          <pre id="card-section-first-checklist" class="debug-block">Waiting for data...</pre>
+        </article>
+
+        <article class="nested-surface stack-sm">
+          <h2>First checklist checkItems</h2>
+          <pre id="card-section-check-items" class="debug-block">Waiting for data...</pre>
+        </article>
+      </section>
+    </section>
+  </main>
+
+  <script src="https://p.trellocdn.com/power-up.min.js"></script>
+  <script src="shared.js"></script>
+  <script src="card-section.js"></script>
+</body>
+</html>
