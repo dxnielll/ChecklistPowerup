@@ -7,8 +7,8 @@
 
   const BOARD_DEFAULTS = {
     showChecklistHeaders: true,
-    completedItemsMode: "dim",
-    completedSectionsMode: "dim",
+    showCompletedItems: true,
+    showCompletedSections: true,
     progressFormat: "percent",
     itemOrder: "incomplete-first"
   };
@@ -19,8 +19,6 @@
   };
 
   const PROGRESS_FORMATS = ["count", "percent"];
-  const COMPLETED_ITEM_MODES = ["dim", "hide"];
-  const COMPLETED_SECTION_MODES = ["dim", "highlight", "hide"];
   const ITEM_ORDERS = ["incomplete-first", "original"];
   const BADGE_ROW_PADDING = "\u2007".repeat(120);
 
@@ -49,18 +47,21 @@
   function normalizeBoardPrefs(raw, fallback) {
     const prefs = raw || {};
     const base = fallback || BOARD_DEFAULTS;
-    const legacyShowCompletedItems = prefs.showCompletedItems;
+    const legacyCompletedItemsMode = prefs.completedItemsMode;
+    const legacyCompletedSectionsMode = prefs.completedSectionsMode;
 
     return {
       showChecklistHeaders: prefs.showChecklistHeaders !== false,
-      completedItemsMode: COMPLETED_ITEM_MODES.includes(prefs.completedItemsMode)
-        ? prefs.completedItemsMode
-        : legacyShowCompletedItems === false
-          ? "hide"
-          : base.completedItemsMode,
-      completedSectionsMode: COMPLETED_SECTION_MODES.includes(prefs.completedSectionsMode)
-        ? prefs.completedSectionsMode
-        : base.completedSectionsMode,
+      showCompletedItems: typeof prefs.showCompletedItems === "boolean"
+        ? prefs.showCompletedItems
+        : legacyCompletedItemsMode === "hide"
+          ? false
+          : base.showCompletedItems,
+      showCompletedSections: typeof prefs.showCompletedSections === "boolean"
+        ? prefs.showCompletedSections
+        : legacyCompletedSectionsMode === "hide"
+          ? false
+          : base.showCompletedSections,
       progressFormat: PROGRESS_FORMATS.includes(prefs.progressFormat)
         ? prefs.progressFormat
         : base.progressFormat,
@@ -271,11 +272,7 @@
       ? createProgressText(checklist.completeCount, checklist.totalCount)
       : createPercentText(checklist.completeCount, checklist.totalCount);
 
-    const sectionColor = checklist.incompleteCount === 0
-      ? normalizedPrefs.completedSectionsMode === "highlight"
-        ? "green"
-        : "light-gray"
-      : "red";
+    const sectionColor = checklist.incompleteCount === 0 ? "green" : "red";
 
     return {
       text: padBadgeRowText(`${checklist.name} [${progressText}]`),
@@ -284,13 +281,8 @@
   }
 
   function buildChecklistItemBadge(item, prefs) {
-    const normalizedPrefs = normalizeBoardPrefs(prefs);
-
     return {
-      text: padBadgeRowText(`  ${item.checked ? "\u25C6" : "\u25C7"} ${item.name}`),
-      color: item.checked && normalizedPrefs.completedItemsMode === "dim"
-        ? "light-gray"
-        : undefined
+      text: padBadgeRowText(`  ${item.checked ? "\u25C6" : "\u25C7"} ${item.name}`)
     };
   }
 
@@ -302,11 +294,11 @@
     normalizedChecklists.forEach((checklist) => {
       const orderedItems = orderChecklistItems(checklist.items, normalizedPrefs.itemOrder);
       const visibleItems = orderedItems.filter((item) => (
-        normalizedPrefs.completedItemsMode !== "hide" || !item.checked
+        normalizedPrefs.showCompletedItems || !item.checked
       ));
       const sectionIsComplete = checklist.incompleteCount === 0 && checklist.totalCount > 0;
 
-      if (sectionIsComplete && normalizedPrefs.completedSectionsMode === "hide") {
+      if (sectionIsComplete && !normalizedPrefs.showCompletedSections) {
         return;
       }
 
@@ -335,8 +327,6 @@
     BOARD_DEFAULTS,
     MEMBER_DEFAULTS,
     PROGRESS_FORMATS,
-    COMPLETED_ITEM_MODES,
-    COMPLETED_SECTION_MODES,
     ITEM_ORDERS,
     getConfig,
     hasApiKey,

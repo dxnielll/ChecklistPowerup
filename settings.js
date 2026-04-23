@@ -18,16 +18,16 @@
 
   const boardInputs = {
     showChecklistHeaders: document.getElementById("board-show-checklist-headers"),
-    completedItemsMode: document.getElementById("board-completed-items-mode"),
-    completedSectionsMode: document.getElementById("board-completed-sections-mode"),
+    showCompletedItems: document.getElementById("board-show-completed-items"),
+    showCompletedSections: document.getElementById("board-show-completed-sections"),
     progressFormat: document.getElementById("board-progress-format"),
     itemOrder: document.getElementById("board-item-order")
   };
 
   const privateInputs = {
     showChecklistHeaders: document.getElementById("private-show-checklist-headers"),
-    completedItemsMode: document.getElementById("private-completed-items-mode"),
-    completedSectionsMode: document.getElementById("private-completed-sections-mode"),
+    showCompletedItems: document.getElementById("private-show-completed-items"),
+    showCompletedSections: document.getElementById("private-show-completed-sections"),
     progressFormat: document.getElementById("private-progress-format"),
     itemOrder: document.getElementById("private-item-order")
   };
