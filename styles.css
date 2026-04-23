@@ -391,13 +391,69 @@ h3 {
   overflow-wrap: anywhere;
 }
 
+.compact-preview-shell {
+  width: min(680px, 100%);
+}
+
+.compact-settings-card {
+  padding: 14px;
+}
+
+.compact-auth-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.compact-auth-actions {
+  justify-content: flex-end;
+}
+
+.compact-help-text {
+  margin-bottom: 0;
+}
+
+.compact-control-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px 14px;
+}
+
+.compact-control {
+  min-width: 0;
+}
+
+.compact-toggle-row {
+  margin-bottom: 0;
+}
+
+.compact-private-panel {
+  padding-top: 4px;
+}
+
+.compact-footer-row {
+  justify-content: flex-start;
+}
+
+.compact-preview-done-row,
+.settings-done-row {
+  margin-top: 4px;
+  justify-content: flex-end;
+}
+
 @media (max-width: 720px) {
-.summary-toolbar {
+ .summary-toolbar {
     grid-template-columns: 1fr;
   }
 
   .standalone-shell,
   .powerup-shell {
     padding: 12px;
+  }
+
+  .compact-control-grid {
+    grid-template-columns: 1fr;
   }
 }

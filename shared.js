@@ -272,12 +272,12 @@
 
   function createProgressBarText(completeCount, totalCount) {
     if (!totalCount) {
-      return "▱▱▱▱▱▱▱▱▱▱";
+      return "▱▱▱▱▱▱▱▱";
     }
 
     const percent = (completeCount / totalCount) * 100;
-    const filledCount = Math.round((percent / 100) * 10);
-    return `${"▰".repeat(filledCount)}${"▱".repeat(10 - filledCount)}`;
+    const filledCount = Math.round((percent / 100) * 8);
+    return `${"▰".repeat(filledCount)}${"▱".repeat(8 - filledCount)}`;
   }
 
   function buildChecklistHeaderBadge(checklist, prefs) {

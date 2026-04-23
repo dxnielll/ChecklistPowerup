@@ -75,10 +75,13 @@
   }
 
   function updatePrivatePanelState() {
-    privateSettingsPanel.classList.toggle("is-disabled", !usePrivateBoardSettings.checked);
+    const isEnabled = usePrivateBoardSettings.checked;
+    privateSettingsPanel.hidden = !isEnabled;
+    privateSettingsPanel.classList.toggle("is-disabled", !isEnabled);
     Object.values(privateInputs).forEach((input) => {
-      input.disabled = !usePrivateBoardSettings.checked;
+      input.disabled = !isEnabled;
     });
+    saveMemberBtn.disabled = !isEnabled;
   }
 
   function setAuthPill(text, toneClass) {

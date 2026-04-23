@@ -93,44 +93,49 @@
           <span>Use my display settings</span>
         </label>
 
-        <div id="private-settings-panel" class="settings-grid">
-          <label class="checkbox-row" for="private-show-checklist-headers">
-            <input id="private-show-checklist-headers" type="checkbox">
-            <span>Show section titles</span>
-          </label>
+        <div id="private-settings-panel" hidden>
+          <div class="settings-grid">
+            <label class="checkbox-row" for="private-show-checklist-headers">
+              <input id="private-show-checklist-headers" type="checkbox">
+              <span>Show section titles</span>
+            </label>
 
-          <label class="checkbox-row" for="private-show-finished-content">
-            <input id="private-show-finished-content" type="checkbox">
-            <span>Show completed tasks</span>
-          </label>
+            <label class="checkbox-row" for="private-show-finished-content">
+              <input id="private-show-finished-content" type="checkbox">
+              <span>Show completed tasks</span>
+            </label>
 
-          <label class="checkbox-row" for="private-show-progress-bar">
-            <input id="private-show-progress-bar" type="checkbox">
-            <span>Show progress bar</span>
-          </label>
+            <label class="checkbox-row" for="private-show-progress-bar">
+              <input id="private-show-progress-bar" type="checkbox">
+              <span>Show progress bar</span>
+            </label>
 
-          <label class="stack-xs" for="private-progress-format">
-            <span>Progress label</span>
-            <select id="private-progress-format">
-              <option value="percent">Percent</option>
-              <option value="count">Count</option>
-            </select>
-          </label>
+            <label class="stack-xs" for="private-progress-format">
+              <span>Progress label</span>
+              <select id="private-progress-format">
+                <option value="percent">Percent</option>
+                <option value="count">Count</option>
+              </select>
+            </label>
 
-          <label class="stack-xs" for="private-item-order">
-            <span>Task order</span>
-            <select id="private-item-order">
-              <option value="incomplete-first">Open tasks first</option>
-              <option value="original">Trello order</option>
-            </select>
-          </label>
-        </div>
+            <label class="stack-xs" for="private-item-order">
+              <span>Task order</span>
+              <select id="private-item-order">
+                <option value="incomplete-first">Open tasks first</option>
+                <option value="original">Trello order</option>
+              </select>
+            </label>
+          </div>
 
-        <div class="button-row">
-          <button id="save-member-btn" class="mod-primary" type="button">Save my display</button>
-          <button id="close-btn" type="button">Done</button>
+          <div class="button-row settings-private-save-row">
+            <button id="save-member-btn" class="mod-primary" type="button">Save my display</button>
+          </div>
         </div>
       </section>
+
+      <div class="button-row settings-done-row">
+        <button id="close-btn" type="button">Done</button>
+      </div>
 
       <p id="settings-status" class="status-text" aria-live="polite">Loading current preferences...</p>
     </section>
