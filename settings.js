@@ -18,14 +18,18 @@
 
   const boardInputs = {
     showChecklistHeaders: document.getElementById("board-show-checklist-headers"),
-    showCompletedItems: document.getElementById("board-show-completed-items"),
-    progressFormat: document.getElementById("board-progress-format")
+    completedItemsMode: document.getElementById("board-completed-items-mode"),
+    completedSectionsMode: document.getElementById("board-completed-sections-mode"),
+    progressFormat: document.getElementById("board-progress-format"),
+    itemOrder: document.getElementById("board-item-order")
   };
 
   const privateInputs = {
     showChecklistHeaders: document.getElementById("private-show-checklist-headers"),
-    showCompletedItems: document.getElementById("private-show-completed-items"),
-    progressFormat: document.getElementById("private-progress-format")
+    completedItemsMode: document.getElementById("private-completed-items-mode"),
+    completedSectionsMode: document.getElementById("private-completed-sections-mode"),
+    progressFormat: document.getElementById("private-progress-format"),
+    itemOrder: document.getElementById("private-item-order")
   };
 
   function setStatus(message, tone) {

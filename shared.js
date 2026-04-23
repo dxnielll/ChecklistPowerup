@@ -7,8 +7,10 @@
 
   const BOARD_DEFAULTS = {
     showChecklistHeaders: true,
-    showCompletedItems: true,
-    progressFormat: "percent"
+    completedItemsMode: "dim",
+    completedSectionsMode: "dim",
+    progressFormat: "percent",
+    itemOrder: "incomplete-first"
   };
 
   const MEMBER_DEFAULTS = {
@@ -17,6 +19,9 @@
   };
 
   const PROGRESS_FORMATS = ["count", "percent"];
+  const COMPLETED_ITEM_MODES = ["dim", "hide"];
+  const COMPLETED_SECTION_MODES = ["dim", "highlight", "hide"];
+  const ITEM_ORDERS = ["incomplete-first", "original"];
   const BADGE_ROW_PADDING = "\u2007".repeat(120);
 
   function getConfig() {
@@ -44,13 +49,24 @@
   function normalizeBoardPrefs(raw, fallback) {
     const prefs = raw || {};
     const base = fallback || BOARD_DEFAULTS;
+    const legacyShowCompletedItems = prefs.showCompletedItems;
 
     return {
       showChecklistHeaders: prefs.showChecklistHeaders !== false,
-      showCompletedItems: prefs.showCompletedItems !== false,
+      completedItemsMode: COMPLETED_ITEM_MODES.includes(prefs.completedItemsMode)
+        ? prefs.completedItemsMode
+        : legacyShowCompletedItems === false
+          ? "hide"
+          : base.completedItemsMode,
+      completedSectionsMode: COMPLETED_SECTION_MODES.includes(prefs.completedSectionsMode)
+        ? prefs.completedSectionsMode
+        : base.completedSectionsMode,
       progressFormat: PROGRESS_FORMATS.includes(prefs.progressFormat)
         ? prefs.progressFormat
-        : base.progressFormat
+        : base.progressFormat,
+      itemOrder: ITEM_ORDERS.includes(prefs.itemOrder)
+        ? prefs.itemOrder
+        : base.itemOrder
     };
   }
 
@@ -154,6 +170,20 @@
     });
   }
 
+  function sortCheckItemsIncompleteFirst(items) {
+    return items.slice().sort((left, right) => {
+      if (left.checked !== right.checked) {
+        return left.checked ? 1 : -1;
+      }
+
+      if ((left.pos || 0) !== (right.pos || 0)) {
+        return (left.pos || 0) - (right.pos || 0);
+      }
+
+      return String(left.name || "").localeCompare(String(right.name || ""));
+    });
+  }
+
   function sortChecklists(checklists) {
     return checklists.slice().sort((left, right) => {
       if ((left.pos || 0) !== (right.pos || 0)) {
@@ -189,6 +219,14 @@
         incompleteCount: Math.max(0, totalCount - completeCount)
       };
     });
+  }
+
+  function orderChecklistItems(items, itemOrder) {
+    if (itemOrder === "original") {
+      return sortCheckItems(items);
+    }
+
+    return sortCheckItemsIncompleteFirst(items);
   }
 
   async function fetchCardChecklists(cardId, token) {
@@ -233,15 +271,26 @@
       ? createProgressText(checklist.completeCount, checklist.totalCount)
       : createPercentText(checklist.completeCount, checklist.totalCount);
 
+    const sectionColor = checklist.incompleteCount === 0
+      ? normalizedPrefs.completedSectionsMode === "highlight"
+        ? "green"
+        : "light-gray"
+      : "red";
+
     return {
-      text: padBadgeRowText(`${progressText} ${checklist.name}`),
-      color: checklist.incompleteCount === 0 ? "green" : "orange"
+      text: padBadgeRowText(`${checklist.name} [${progressText}]`),
+      color: sectionColor
     };
   }
 
-  function buildChecklistItemBadge(item) {
+  function buildChecklistItemBadge(item, prefs) {
+    const normalizedPrefs = normalizeBoardPrefs(prefs);
+
     return {
-      text: padBadgeRowText(`${item.checked ? "\u2611" : "\u2610"} ${item.name}`)
+      text: padBadgeRowText(`  ${item.checked ? "\u25C6" : "\u25C7"} ${item.name}`),
+      color: item.checked && normalizedPrefs.completedItemsMode === "dim"
+        ? "light-gray"
+        : undefined
     };
   }
 
@@ -251,16 +300,22 @@
     const badges = [];
 
     normalizedChecklists.forEach((checklist) => {
-      const visibleItems = checklist.items.filter((item) => (
-        normalizedPrefs.showCompletedItems || !item.checked
+      const orderedItems = orderChecklistItems(checklist.items, normalizedPrefs.itemOrder);
+      const visibleItems = orderedItems.filter((item) => (
+        normalizedPrefs.completedItemsMode !== "hide" || !item.checked
       ));
+      const sectionIsComplete = checklist.incompleteCount === 0 && checklist.totalCount > 0;
+
+      if (sectionIsComplete && normalizedPrefs.completedSectionsMode === "hide") {
+        return;
+      }
 
       if (normalizedPrefs.showChecklistHeaders) {
         badges.push(buildChecklistHeaderBadge(checklist, normalizedPrefs));
       }
 
       visibleItems.forEach((item) => {
-        badges.push(buildChecklistItemBadge(item));
+        badges.push(buildChecklistItemBadge(item, normalizedPrefs));
       });
     });
 
@@ -280,6 +335,9 @@
     BOARD_DEFAULTS,
     MEMBER_DEFAULTS,
     PROGRESS_FORMATS,
+    COMPLETED_ITEM_MODES,
+    COMPLETED_SECTION_MODES,
+    ITEM_ORDERS,
     getConfig,
     hasApiKey,
     getInitOptions,

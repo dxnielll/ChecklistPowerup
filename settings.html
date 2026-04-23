@@ -49,9 +49,21 @@
             <span>Show checklist headers</span>
           </label>
 
-          <label class="checkbox-row" for="board-show-completed-items">
-            <input id="board-show-completed-items" type="checkbox">
-            <span>Show completed items</span>
+          <label class="stack-xs" for="board-completed-items-mode">
+            <span>Completed tasks</span>
+            <select id="board-completed-items-mode">
+              <option value="dim">show dimmed</option>
+              <option value="hide">hide</option>
+            </select>
+          </label>
+
+          <label class="stack-xs" for="board-completed-sections-mode">
+            <span>Completed sections</span>
+            <select id="board-completed-sections-mode">
+              <option value="dim">show dimmed</option>
+              <option value="highlight">highlight in green</option>
+              <option value="hide">hide</option>
+            </select>
           </label>
 
           <label class="stack-xs" for="board-progress-format">
@@ -59,6 +71,14 @@
             <select id="board-progress-format">
               <option value="percent">percentage complete</option>
               <option value="count">completed / total</option>
+            </select>
+          </label>
+
+          <label class="stack-xs" for="board-item-order">
+            <span>Item order</span>
+            <select id="board-item-order">
+              <option value="incomplete-first">incomplete first</option>
+              <option value="original">original Trello order</option>
             </select>
           </label>
         </div>
@@ -87,9 +107,21 @@
             <span>Show checklist headers</span>
           </label>
 
-          <label class="checkbox-row" for="private-show-completed-items">
-            <input id="private-show-completed-items" type="checkbox">
-            <span>Show completed items</span>
+          <label class="stack-xs" for="private-completed-items-mode">
+            <span>Completed tasks</span>
+            <select id="private-completed-items-mode">
+              <option value="dim">show dimmed</option>
+              <option value="hide">hide</option>
+            </select>
+          </label>
+
+          <label class="stack-xs" for="private-completed-sections-mode">
+            <span>Completed sections</span>
+            <select id="private-completed-sections-mode">
+              <option value="dim">show dimmed</option>
+              <option value="highlight">highlight in green</option>
+              <option value="hide">hide</option>
+            </select>
           </label>
 
           <label class="stack-xs" for="private-progress-format">
@@ -97,6 +129,14 @@
             <select id="private-progress-format">
               <option value="percent">percentage complete</option>
               <option value="count">completed / total</option>
+            </select>
+          </label>
+
+          <label class="stack-xs" for="private-item-order">
+            <span>Item order</span>
+            <select id="private-item-order">
+              <option value="incomplete-first">incomplete first</option>
+              <option value="original">original Trello order</option>
             </select>
           </label>
         </div>
