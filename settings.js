@@ -18,16 +18,16 @@
 
   const boardInputs = {
     showChecklistHeaders: document.getElementById("board-show-checklist-headers"),
-    showCompletedItems: document.getElementById("board-show-completed-items"),
-    showCompletedSections: document.getElementById("board-show-completed-sections"),
+    showFinishedContent: document.getElementById("board-show-finished-content"),
+    showProgressBar: document.getElementById("board-show-progress-bar"),
     progressFormat: document.getElementById("board-progress-format"),
     itemOrder: document.getElementById("board-item-order")
   };
 
   const privateInputs = {
     showChecklistHeaders: document.getElementById("private-show-checklist-headers"),
-    showCompletedItems: document.getElementById("private-show-completed-items"),
-    showCompletedSections: document.getElementById("private-show-completed-sections"),
+    showFinishedContent: document.getElementById("private-show-finished-content"),
+    showProgressBar: document.getElementById("private-show-progress-bar"),
     progressFormat: document.getElementById("private-progress-format"),
     itemOrder: document.getElementById("private-item-order")
   };
@@ -100,7 +100,7 @@
       connectBtn.disabled = authorized;
       disconnectBtn.disabled = !authorized;
     } catch (error) {
-      setAuthPill("Auth check failed", "pill-warning");
+      setAuthPill("Connection check failed", "pill-warning");
       connectBtn.disabled = false;
       disconnectBtn.disabled = true;
     }
@@ -132,7 +132,7 @@
 
     updateBoardPermissionState();
     await refreshAuthorizationState();
-    setStatus("Loaded current preferences.", "success");
+    setStatus("Loaded current display settings.", "success");
     await syncHeight();
   }
 
@@ -186,18 +186,18 @@
 
   saveBoardBtn.addEventListener("click", async function () {
     if (!canWriteBoard) {
-      setStatus("You need board edit access to save board defaults.", "error");
+      setStatus("You need board edit access to save board display settings.", "error");
       return;
     }
 
     saveBoardBtn.disabled = true;
-    setStatus("Saving board defaults...", "pending");
+    setStatus("Saving board display...", "pending");
 
     try {
       await App.saveBoardPreferences(t, readBoardPrefsFromForm());
-      setStatus("Saved board defaults.", "success");
+      setStatus("Saved board display.", "success");
     } catch (error) {
-      setStatus(`Could not save board defaults: ${error.message}`, "error");
+      setStatus(`Could not save board display: ${error.message}`, "error");
     } finally {
       updateBoardPermissionState();
       await syncHeight();
@@ -206,13 +206,13 @@
 
   saveMemberBtn.addEventListener("click", async function () {
     saveMemberBtn.disabled = true;
-    setStatus("Saving your preferences...", "pending");
+    setStatus("Saving your display...", "pending");
 
     try {
       await App.saveMemberPreferences(t, readMemberPrefsFromForm());
-      setStatus("Saved your preferences.", "success");
+      setStatus("Saved your display.", "success");
     } catch (error) {
-      setStatus(`Could not save your preferences: ${error.message}`, "error");
+      setStatus(`Could not save your display: ${error.message}`, "error");
     } finally {
       saveMemberBtn.disabled = false;
       await syncHeight();

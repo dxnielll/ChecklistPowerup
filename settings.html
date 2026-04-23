@@ -13,14 +13,13 @@
       <header class="stack-sm">
         <p class="eyebrow">Checklist settings</p>
         <h1>Front-card checklist rows</h1>
-        <p class="quiet">This Power-Up renders checklist headers and checklist items directly on the front of cards using Trello badge rows.</p>
+        <p class="quiet">This Power-Up renders section titles and task rows directly on the front of cards using Trello badge rows.</p>
       </header>
 
       <section class="stack-md">
         <div class="section-heading">
           <div>
-            <h2>Trello access</h2>
-            <p class="quiet">Authorize read access once so the Power-Up can load full checklist items for each card.</p>
+            <p class="quiet">Connect Trello once so this Power-Up can load checklist items on card fronts.</p>
           </div>
           <span id="auth-status-pill" class="pill">Checking access...</span>
         </div>
@@ -28,8 +27,8 @@
         <div class="callout stack-sm">
           <p class="quiet">Make sure your Power-Up API key is configured in <code>config.js</code> and your GitHub Pages origin is allowed in the Power-Up admin API key settings.</p>
           <div class="button-row">
-            <button id="connect-btn" class="mod-primary" type="button">Connect Trello access</button>
-            <button id="disconnect-btn" type="button">Disconnect</button>
+            <button id="connect-btn" class="mod-primary" type="button">Connect Trello</button>
+            <button id="disconnect-btn" type="button">Disconnect Trello</button>
           </div>
         </div>
       </section>
@@ -37,8 +36,8 @@
       <section class="stack-md">
         <div class="section-heading">
           <div>
-            <h2>Board defaults</h2>
-            <p class="quiet">These settings control the checklist rows shown on the front of cards for everyone on the board.</p>
+            <h2>Board display</h2>
+            <p class="quiet">These settings control the section titles and task rows shown on the front of cards for everyone on the board.</p>
           </div>
           <span id="board-permission-pill" class="pill">Checking permissions...</span>
         </div>
@@ -46,89 +45,89 @@
         <div class="settings-grid">
           <label class="checkbox-row" for="board-show-checklist-headers">
             <input id="board-show-checklist-headers" type="checkbox">
-            <span>Show checklist headers</span>
+            <span>Show section titles</span>
           </label>
 
-          <label class="checkbox-row" for="board-show-completed-items">
-            <input id="board-show-completed-items" type="checkbox">
+          <label class="checkbox-row" for="board-show-finished-content">
+            <input id="board-show-finished-content" type="checkbox">
             <span>Show completed tasks</span>
           </label>
 
-          <label class="checkbox-row" for="board-show-completed-sections">
-            <input id="board-show-completed-sections" type="checkbox">
-            <span>Show completed sections</span>
+          <label class="checkbox-row" for="board-show-progress-bar">
+            <input id="board-show-progress-bar" type="checkbox">
+            <span>Show progress bar</span>
           </label>
 
           <label class="stack-xs" for="board-progress-format">
-            <span>Header progress format</span>
+            <span>Progress label</span>
             <select id="board-progress-format">
-              <option value="percent">percentage complete</option>
-              <option value="count">completed / total</option>
+              <option value="percent">Percent</option>
+              <option value="count">Count</option>
             </select>
           </label>
 
           <label class="stack-xs" for="board-item-order">
-            <span>Item order</span>
+            <span>Task order</span>
             <select id="board-item-order">
-              <option value="incomplete-first">incomplete first</option>
-              <option value="original">original Trello order</option>
+              <option value="incomplete-first">Open tasks first</option>
+              <option value="original">Trello order</option>
             </select>
           </label>
         </div>
 
         <div class="button-row">
-          <button id="save-board-btn" class="mod-primary" type="button">Save board defaults</button>
+          <button id="save-board-btn" class="mod-primary" type="button">Save board display</button>
         </div>
       </section>
 
       <section class="stack-md">
         <div class="section-heading">
           <div>
-            <h2>My preferences</h2>
-            <p class="quiet">Enable private board settings if you want your own checklist-row display on this board.</p>
+            <h2>My display</h2>
+            <p class="quiet">Enable private board settings if you want your own section-and-task display on this board.</p>
           </div>
         </div>
 
         <label class="checkbox-row" for="use-private-board-settings">
           <input id="use-private-board-settings" type="checkbox">
-          <span>Use private board settings</span>
+          <span>Use my display settings</span>
         </label>
 
         <div id="private-settings-panel" class="settings-grid">
           <label class="checkbox-row" for="private-show-checklist-headers">
             <input id="private-show-checklist-headers" type="checkbox">
-            <span>Show checklist headers</span>
+            <span>Show section titles</span>
           </label>
 
-          <label class="checkbox-row" for="private-show-completed-items">
-            <input id="private-show-completed-items" type="checkbox">
+          <label class="checkbox-row" for="private-show-finished-content">
+            <input id="private-show-finished-content" type="checkbox">
             <span>Show completed tasks</span>
           </label>
 
-          <label class="checkbox-row" for="private-show-completed-sections">
-            <input id="private-show-completed-sections" type="checkbox">
-            <span>Show completed sections</span>
+          <label class="checkbox-row" for="private-show-progress-bar">
+            <input id="private-show-progress-bar" type="checkbox">
+            <span>Show progress bar</span>
           </label>
 
           <label class="stack-xs" for="private-progress-format">
-            <span>Header progress format</span>
+            <span>Progress label</span>
             <select id="private-progress-format">
-              <option value="percent">percentage complete</option>
-              <option value="count">completed / total</option>
+              <option value="percent">Percent</option>
+              <option value="count">Count</option>
             </select>
           </label>
 
           <label class="stack-xs" for="private-item-order">
-            <span>Item order</span>
+            <span>Task order</span>
             <select id="private-item-order">
-              <option value="incomplete-first">incomplete first</option>
-              <option value="original">original Trello order</option>
+              <option value="incomplete-first">Open tasks first</option>
+              <option value="original">Trello order</option>
             </select>
           </label>
         </div>
 
         <div class="button-row">
-          <button id="save-member-btn" class="mod-primary" type="button">Save my preferences</button>
+          <button id="save-member-btn" class="mod-primary" type="button">Save my display</button>
           <button id="close-btn" type="button">Done</button>
         </div>
       </section>

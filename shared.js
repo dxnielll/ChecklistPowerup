@@ -7,8 +7,8 @@
 
   const BOARD_DEFAULTS = {
     showChecklistHeaders: true,
-    showCompletedItems: true,
-    showCompletedSections: true,
+    showFinishedContent: false,
+    showProgressBar: true,
     progressFormat: "percent",
     itemOrder: "incomplete-first"
   };
@@ -49,19 +49,23 @@
     const base = fallback || BOARD_DEFAULTS;
     const legacyCompletedItemsMode = prefs.completedItemsMode;
     const legacyCompletedSectionsMode = prefs.completedSectionsMode;
+    const legacyShowCompletedItems = prefs.showCompletedItems;
+    const legacyShowCompletedSections = prefs.showCompletedSections;
+
+    let showFinishedContent = base.showFinishedContent;
+
+    if (typeof prefs.showFinishedContent === "boolean") {
+      showFinishedContent = prefs.showFinishedContent;
+    } else if (typeof legacyShowCompletedItems === "boolean" || typeof legacyShowCompletedSections === "boolean") {
+      showFinishedContent = legacyShowCompletedItems !== false || legacyShowCompletedSections !== false;
+    } else if (legacyCompletedItemsMode === "hide" || legacyCompletedSectionsMode === "hide") {
+      showFinishedContent = false;
+    }
 
     return {
       showChecklistHeaders: prefs.showChecklistHeaders !== false,
-      showCompletedItems: typeof prefs.showCompletedItems === "boolean"
-        ? prefs.showCompletedItems
-        : legacyCompletedItemsMode === "hide"
-          ? false
-          : base.showCompletedItems,
-      showCompletedSections: typeof prefs.showCompletedSections === "boolean"
-        ? prefs.showCompletedSections
-        : legacyCompletedSectionsMode === "hide"
-          ? false
-          : base.showCompletedSections,
+      showFinishedContent,
+      showProgressBar: prefs.showProgressBar !== false,
       progressFormat: PROGRESS_FORMATS.includes(prefs.progressFormat)
         ? prefs.progressFormat
         : base.progressFormat,
@@ -266,23 +270,36 @@
     return `${Math.round((completeCount / totalCount) * 100)}%`;
   }
 
+  function createProgressBarText(completeCount, totalCount) {
+    if (!totalCount) {
+      return "▱▱▱▱▱▱▱▱▱▱";
+    }
+
+    const percent = (completeCount / totalCount) * 100;
+    const filledCount = Math.round((percent / 100) * 10);
+    return `${"▰".repeat(filledCount)}${"▱".repeat(10 - filledCount)}`;
+  }
+
   function buildChecklistHeaderBadge(checklist, prefs) {
     const normalizedPrefs = normalizeBoardPrefs(prefs);
     const progressText = normalizedPrefs.progressFormat === "count"
       ? createProgressText(checklist.completeCount, checklist.totalCount)
       : createPercentText(checklist.completeCount, checklist.totalCount);
-
+    const progressBarText = createProgressBarText(checklist.completeCount, checklist.totalCount);
     const sectionColor = checklist.incompleteCount === 0 ? "green" : "red";
+    const headerText = normalizedPrefs.showProgressBar
+      ? `${checklist.name} [${progressText}] / ${progressBarText}`
+      : `${checklist.name} [${progressText}]`;
 
     return {
-      text: padBadgeRowText(`${checklist.name} [${progressText}]`),
+      text: padBadgeRowText(headerText),
       color: sectionColor
     };
   }
 
   function buildChecklistItemBadge(item, prefs) {
     return {
-      text: padBadgeRowText(`  ${item.checked ? "\u25C6" : "\u25C7"} ${item.name}`)
+      text: padBadgeRowText(`  ${item.checked ? "\u2611" : "\u2610"} ${item.name}`)
     };
   }
 
@@ -294,11 +311,11 @@
     normalizedChecklists.forEach((checklist) => {
       const orderedItems = orderChecklistItems(checklist.items, normalizedPrefs.itemOrder);
       const visibleItems = orderedItems.filter((item) => (
-        normalizedPrefs.showCompletedItems || !item.checked
+        normalizedPrefs.showFinishedContent || !item.checked
       ));
       const sectionIsComplete = checklist.incompleteCount === 0 && checklist.totalCount > 0;
 
-      if (sectionIsComplete && !normalizedPrefs.showCompletedSections) {
+      if (sectionIsComplete && !normalizedPrefs.showFinishedContent) {
         return;
       }
 
@@ -347,6 +364,7 @@
     buildChecklistRowBadges,
     createProgressText,
     createPercentText,
+    createProgressBarText,
     padBadgeRowText,
     truncate,
     escapeHtml
