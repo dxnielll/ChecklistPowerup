@@ -4,30 +4,17 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Checklist Companion Connector</title>
-  <link rel="stylesheet" href="https://p.trellocdn.com/power-up.css">
-  <link rel="stylesheet" href="styles.css">
+  <style>
+    html,
+    body {
+      margin: 0;
+      width: 100%;
+      min-height: 100%;
+      background: transparent;
+    }
+  </style>
 </head>
-<body class="connector-page">
-  <main id="content" class="standalone-shell">
-    <section class="surface standalone-panel">
-      <p class="eyebrow">Trello Power-Up</p>
-      <h1>Checklist Companion</h1>
-      <p>
-        Use this page as the iframe connector URL for a custom Trello Power-Up that shows checklist headers and checklist items directly on the front of Trello cards.
-      </p>
-      <ol class="setup-list">
-        <li>Create a custom Power-Up in <code>https://trello.com/apps/admin</code>.</li>
-        <li>Set this file's hosted URL as the <code>iframe Connector URL</code>.</li>
-        <li>Generate an API key for the Power-Up, add <code>https://dxnielll.github.io</code> to the allowed origins, and paste the key into <code>config.js</code>.</li>
-        <li>Enable <code>card-badges</code> and <code>show-settings</code>.</li>
-        <li>Add the Power-Up to a board in the same Workspace, open Power-Up settings, and connect Trello access once.</li>
-      </ol>
-      <p class="quiet">
-        If you are opening this page directly in a browser, it is working as expected. Trello will load it silently as the connector iframe.
-      </p>
-    </section>
-  </main>
-
+<body>
   <script src="https://p.trellocdn.com/power-up.min.js"></script>
   <script src="config.js"></script>
   <script src="shared.js"></script>
