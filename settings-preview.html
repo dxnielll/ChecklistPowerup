@@ -9,14 +9,13 @@
 </head>
 <body class="connector-page">
   <main class="standalone-shell">
-    <section class="surface standalone-panel stack-md compact-preview-shell">
-      <header class="stack-sm">
-        <p class="eyebrow">Preview</p>
-        <h1>Compact Settings Layout</h1>
-        <p class="quiet">Standalone mockup for the next settings UI. This page is only for review and does not save anything.</p>
+    <section class="surface standalone-panel stack-md compact-preview-shell settings-flat-shell">
+      <header class="stack-xs settings-header-block">
+        <p class="eyebrow">Checklist settings</p>
+        <h1>Checklist Details on Card Front</h1>
       </header>
 
-      <section class="nested-surface stack-sm compact-settings-card">
+      <section class="stack-xs settings-section">
         <div class="compact-auth-row">
           <span class="pill pill-success">Connected</span>
           <div class="button-row compact-auth-actions">
@@ -24,29 +23,29 @@
             <button type="button">Disconnect Trello</button>
           </div>
         </div>
-        <p class="quiet compact-help-text">Connect once so card fronts can load checklist items.</p>
+        <p class="quiet compact-help-text">To connect Trello, add your API key and allow this site in Trello admin.</p>
       </section>
 
-      <section class="nested-surface stack-sm compact-settings-card">
-        <div class="section-heading wrap-heading">
-          <h2>Board display</h2>
+      <section class="stack-sm settings-section">
+        <h2>Board display</h2>
+        <div class="button-row settings-status-line">
           <span class="pill pill-success">Can edit</span>
         </div>
 
         <div class="compact-control-grid">
           <label class="checkbox-row compact-control" for="preview-board-sections">
             <input id="preview-board-sections" type="checkbox" checked>
-            <span>Section titles</span>
+            <span>Show section titles</span>
           </label>
 
           <label class="checkbox-row compact-control" for="preview-board-finished">
             <input id="preview-board-finished" type="checkbox">
-            <span>Completed tasks</span>
+            <span>Show completed tasks</span>
           </label>
 
           <label class="checkbox-row compact-control" for="preview-board-progress-bar">
             <input id="preview-board-progress-bar" type="checkbox" checked>
-            <span>Progress bar</span>
+            <span>Show progress bar</span>
           </label>
 
           <label class="stack-xs compact-control" for="preview-board-progress-label">
@@ -71,7 +70,7 @@
         </div>
       </section>
 
-      <section class="nested-surface stack-sm compact-settings-card">
+      <section class="stack-sm settings-section">
         <label class="checkbox-row compact-toggle-row" for="preview-private-enabled">
           <input id="preview-private-enabled" type="checkbox" checked>
           <span>Use my display settings</span>
@@ -83,17 +82,17 @@
           <div class="compact-control-grid">
             <label class="checkbox-row compact-control" for="preview-private-sections">
               <input id="preview-private-sections" type="checkbox" checked>
-              <span>Section titles</span>
+              <span>Show section titles</span>
             </label>
 
             <label class="checkbox-row compact-control" for="preview-private-finished">
               <input id="preview-private-finished" type="checkbox">
-              <span>Completed tasks</span>
+              <span>Show completed tasks</span>
             </label>
 
             <label class="checkbox-row compact-control" for="preview-private-progress-bar">
               <input id="preview-private-progress-bar" type="checkbox" checked>
-              <span>Progress bar</span>
+              <span>Show progress bar</span>
             </label>
 
             <label class="stack-xs compact-control" for="preview-private-progress-label">

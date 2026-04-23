@@ -9,40 +9,30 @@
 </head>
 <body>
   <main id="content" class="powerup-shell">
-    <section class="surface stack-lg">
-      <header class="stack-sm">
+    <section class="surface stack-md settings-flat-shell">
+      <header class="stack-xs settings-header-block">
         <p class="eyebrow">Checklist settings</p>
-        <h1>Front-card checklist rows</h1>
-        <p class="quiet">This Power-Up renders section titles and task rows directly on the front of cards using Trello badge rows.</p>
+        <h1>Checklist Details on Card Front</h1>
       </header>
 
-      <section class="stack-md">
-        <div class="section-heading">
-          <div>
-            <p class="quiet">Connect Trello once so this Power-Up can load checklist items on card fronts.</p>
-          </div>
+      <section class="stack-xs settings-section">
+        <div class="compact-auth-row">
           <span id="auth-status-pill" class="pill">Checking access...</span>
-        </div>
-
-        <div class="callout stack-sm">
-          <p class="quiet">Make sure your Power-Up API key is configured in <code>config.js</code> and your GitHub Pages origin is allowed in the Power-Up admin API key settings.</p>
-          <div class="button-row">
+          <div class="button-row compact-auth-actions">
             <button id="connect-btn" class="mod-primary" type="button">Connect Trello</button>
             <button id="disconnect-btn" type="button">Disconnect Trello</button>
           </div>
         </div>
+        <p class="quiet compact-help-text">To connect Trello, add your API key and allow this site in Trello admin.</p>
       </section>
 
-      <section class="stack-md">
-        <div class="section-heading">
-          <div>
-            <h2>Board display</h2>
-            <p class="quiet">These settings control the section titles and task rows shown on the front of cards for everyone on the board.</p>
-          </div>
+      <section class="stack-sm settings-section">
+        <h2>Board display</h2>
+        <div class="button-row settings-status-line">
           <span id="board-permission-pill" class="pill">Checking permissions...</span>
         </div>
 
-        <div class="settings-grid">
+        <div class="settings-grid compact-control-grid">
           <label class="checkbox-row" for="board-show-checklist-headers">
             <input id="board-show-checklist-headers" type="checkbox">
             <span>Show section titles</span>
@@ -80,21 +70,15 @@
         </div>
       </section>
 
-      <section class="stack-md">
-        <div class="section-heading">
-          <div>
-            <h2>My display</h2>
-            <p class="quiet">Enable private board settings if you want your own section-and-task display on this board.</p>
-          </div>
-        </div>
-
+      <section class="stack-sm settings-section">
+        <h2>My display</h2>
         <label class="checkbox-row" for="use-private-board-settings">
           <input id="use-private-board-settings" type="checkbox">
           <span>Use my display settings</span>
         </label>
 
         <div id="private-settings-panel" hidden>
-          <div class="settings-grid">
+          <div class="settings-grid compact-control-grid">
             <label class="checkbox-row" for="private-show-checklist-headers">
               <input id="private-show-checklist-headers" type="checkbox">
               <span>Show section titles</span>

@@ -395,8 +395,24 @@ h3 {
   width: min(680px, 100%);
 }
 
-.compact-settings-card {
-  padding: 14px;
+.settings-flat-shell {
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+
+.settings-header-block h1 {
+  margin-bottom: 0;
+}
+
+.settings-section {
+  padding-top: 2px;
+}
+
+.settings-status-line {
+  margin-top: -2px;
 }
 
 .compact-auth-row {
@@ -413,6 +429,7 @@ h3 {
 
 .compact-help-text {
   margin-bottom: 0;
+  max-width: 40rem;
 }
 
 .compact-control-grid {
@@ -430,16 +447,20 @@ h3 {
 }
 
 .compact-private-panel {
-  padding-top: 4px;
+  padding-top: 2px;
 }
 
 .compact-footer-row {
   justify-content: flex-start;
 }
 
+.settings-private-save-row {
+  margin-top: 8px;
+}
+
 .compact-preview-done-row,
 .settings-done-row {
-  margin-top: 4px;
+  margin-top: 8px;
   justify-content: flex-end;
 }
 
